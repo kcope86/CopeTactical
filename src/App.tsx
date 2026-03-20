@@ -11,14 +11,18 @@ function HomePage() {
         <p className="subtitle">Website coming soon.</p>
 
         <div className="contact">
-          <Link to="/contact?to=support@copetactical.com">
-            support@copetactical.com
-          </Link>
-          <br />
-          <Link to="/contact?to=sales@copetactical.com">
-            sales@copetactical.com
-          </Link>
-        </div>
+  <div>Click an email to contact:</div>
+
+  <Link to="/contact?to=support@copetactical.com">
+    support@copetactical.com
+  </Link>
+
+  <br />
+
+  <Link to="/contact?to=sales@copetactical.com">
+    sales@copetactical.com
+  </Link>
+</div>
 
         <div className="footer">
           &copy; 2026 Cope Tactical. All rights reserved.

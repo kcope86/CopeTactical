@@ -89,6 +89,13 @@ a:hover {
     display: inline-block;
     padding: 2px 0;
     word-break: break-word;
+    color: #9acd32;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.contact a:hover {
+    color: #c6ff5c;
 }
 
 .footer {
