@@ -46,7 +46,7 @@ export default function ContactPage() {
 
             <div className="subtitle contact-subtitle">
               Fill out the form below to get in touch. <br />
-              Expect a response within the same week.
+              Expect a response within a couple business days.
             </div>
 
             <form onSubmit={handleSubmit}>

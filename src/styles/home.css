@@ -30,13 +30,13 @@
     display: inline-block;
     padding: 2px 0;
     word-break: break-word;
-    color: #9acd32;
+    color: var(--color-highlight);
     font-weight: bold;
     text-decoration: underline;
 }
 
 .contact a:hover {
-    color: #c6ff5c;
+    color: #a8c77e;
 }
 
 /* ===== Featured section ===== */
@@ -44,7 +44,7 @@
 .featured {
     --featured-gap: 20px;
     --featured-visible-count: 4;
-    background: #0d0d0d;
+    background: var(--color-bg);
     padding: 60px 20px;
 }
 
@@ -72,7 +72,10 @@
 .featured-track {
     display: grid;
     grid-auto-flow: column;
-    grid-auto-columns: calc((100% - (var(--featured-gap) * (var(--featured-visible-count) - 1))) / var(--featured-visible-count));
+    grid-auto-columns: calc(
+        (100% - (var(--featured-gap) * (var(--featured-visible-count) - 1)))
+        / var(--featured-visible-count)
+    );
     gap: var(--featured-gap);
     transition: transform 420ms ease;
     will-change: transform;
@@ -81,10 +84,10 @@
 .featured-arrow {
     width: 42px;
     height: 42px;
-    border: 1px solid #333;
+    border: 1px solid var(--color-border);
     border-radius: 999px;
-    background: #161616;
-    color: #e6e6e6;
+    background: var(--color-surface);
+    color: var(--color-text);
     font-size: 1.8rem;
     line-height: 1;
     cursor: pointer;
@@ -92,24 +95,27 @@
 }
 
 .featured-arrow:hover {
-    border-color: #8aa36b;
-    color: #8aa36b;
+    border-color: var(--color-highlight);
+    color: var(--color-highlight);
 }
 
 .featured-card {
-    background: #161616;
-    border: 1px solid #2a2a2a;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
     padding: 10px;
-    transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        border-color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .featured-card:hover {
-    border-color: #8aa36b;
+    border-color: var(--color-highlight);
     transform: translateY(-2px);
 }
 
 .featured-card.active {
-    border-color: #8aa36b;
+    border-color: var(--color-highlight);
     box-shadow: 0 0 0 1px rgba(138, 163, 107, 0.25);
 }
 
@@ -122,7 +128,7 @@
 .featured-card h3 {
     margin: 12px 0 4px;
     font-size: 1rem;
-    color: #e6e6e6;
+    color: var(--color-text);
 }
 
 .featured-dots {
@@ -137,13 +143,13 @@
     height: 10px;
     border: none;
     border-radius: 999px;
-    background: #444;
+    background: var(--color-border);
     cursor: pointer;
     padding: 0;
 }
 
 .featured-dot.active {
-    background: #8aa36b;
+    background: var(--color-highlight);
 }
 
 .featured-dot:hover {
@@ -153,7 +159,7 @@
 /* ===== About preview ===== */
 
 .about-preview {
-    background: #111111;
+    background: var(--color-surface);
     padding: 60px 20px;
 }
 
@@ -167,7 +173,7 @@
     font-size: 12px;
     letter-spacing: 2px;
     text-transform: uppercase;
-    color: #8aa36b;
+    color: var(--color-highlight);
     margin-bottom: 10px;
 }
 
@@ -178,21 +184,23 @@
 .about-preview-text {
     max-width: 720px;
     margin: 0 auto 24px;
-    color: #b5b5b5;
+    color: var(--color-muted-text);
     line-height: 1.6;
 }
 
 .about-preview-link {
     display: inline-block;
     padding: 8px 16px;
-    border: 1px solid #3a3a3a;
-    background: #1a1a1a;
+    border: 1px solid var(--color-border);
+    background: var(--color-accent);
 }
 
 .about-preview-link:hover {
-    border-color: #8aa36b;
-    color: #8aa36b;
+    border-color: var(--color-highlight);
+    color: var(--color-highlight);
 }
+
+/* ===== Responsive ===== */
 
 @media (max-width: 1100px) {
     .featured {
