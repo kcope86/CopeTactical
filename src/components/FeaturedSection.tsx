@@ -11,7 +11,7 @@ const SWIPE_THRESHOLD_PX = 50;
 
 function getVisibleCount(width: number): number {
   if (width <= 480) {
-    return 1;
+    return 3;
   }
 
   if (width <= 1100) {
