@@ -8,7 +8,7 @@ export default function Header() {
         <div className="header-left">
           <Link to="/" className="logo-link">
             <img
-              src="/logo-header.png"
+              src="/images/icons/logo-header.png"
               alt="Cope Tactical"
               className="header-logo"
             />
