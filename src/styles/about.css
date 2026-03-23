@@ -1,0 +1,75 @@
+.about-page {
+    background: #0b0b0b;
+}
+
+.about-hero {
+    padding: 70px 20px 40px;
+    background: linear-gradient(to bottom, #101010, #0b0b0b);
+}
+
+.about-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.about-image {
+    max-width: 600px;
+    width: 100%;
+    border-radius: 8px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.about-subtitle {
+    margin-top: 0;
+}
+
+.about-section {
+    padding: 20px 20px 70px;
+}
+
+.about-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.about-copy {
+    max-width: 850px;
+    margin: 0 auto;
+    background: #141414;
+    border: 1px solid #2a2a2a;
+    padding: 24px;
+    text-align: center;
+}
+
+.about-copy p {
+    margin: 0;
+    color: #b5b5b5;
+    line-height: 1.7;
+}
+
+@media (max-width: 768px) {
+    .about-hero {
+        padding: 56px 20px 32px;
+    }
+
+    .about-copy {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .about-inner {
+        padding: 0 14px;
+    }
+
+    .about-hero {
+        padding: 46px 16px 28px;
+    }
+
+    .about-copy {
+        padding: 16px;
+    }
+}
