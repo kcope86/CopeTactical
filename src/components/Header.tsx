@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type NavItem = {
   to: string;
@@ -10,6 +10,7 @@ type NavItem = {
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const headerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     function handleResize() {
@@ -25,6 +26,38 @@ export default function Header() {
   useEffect(() => {
     setIsMenuOpen(false);
   }, [location.pathname, location.hash]);
+
+  useEffect(() => {
+    if (!isMenuOpen) {
+      return;
+    }
+
+    function handleDocumentPointerDown(e: MouseEvent | TouchEvent) {
+      if (!headerRef.current) {
+        return;
+      }
+
+      if (!headerRef.current.contains(e.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    }
+
+    function handleWindowScroll() {
+      setIsMenuOpen(false);
+    }
+
+    document.addEventListener("mousedown", handleDocumentPointerDown);
+    document.addEventListener("touchstart", handleDocumentPointerDown, {
+      passive: true,
+    });
+    window.addEventListener("scroll", handleWindowScroll, { passive: true });
+
+    return () => {
+      document.removeEventListener("mousedown", handleDocumentPointerDown);
+      document.removeEventListener("touchstart", handleDocumentPointerDown);
+      window.removeEventListener("scroll", handleWindowScroll);
+    };
+  }, [isMenuOpen]);
 
   function closeMenu() {
     setIsMenuOpen(false);
@@ -43,7 +76,9 @@ export default function Header() {
     {
       to: "/gallery",
       label: "Gallery",
-      isActive: location.pathname.startsWith("/gallery") || location.pathname.startsWith("/build/"),
+      isActive:
+        location.pathname.startsWith("/gallery") ||
+        location.pathname.startsWith("/build/"),
     },
   ];
 
@@ -51,7 +86,9 @@ export default function Header() {
     {
       to: "/about",
       label: "About",
-      isActive: location.pathname.startsWith("/about") || location.pathname.startsWith("/paracord"),
+      isActive:
+        location.pathname.startsWith("/about") ||
+        location.pathname.startsWith("/paracord"),
     },
     {
       to: "/contact",
@@ -63,7 +100,10 @@ export default function Header() {
   const mobileNavItems = [...centerNavItems, ...rightNavItems];
 
   return (
-    <header className="site-header">
+    <header
+      ref={headerRef}
+      className={`site-header${isMenuOpen ? " mobile-open" : ""}`}
+    >
       <div className="header-inner">
         <div className="header-left">
           <Link to="/" className="logo-link" onClick={closeMenu}>
@@ -81,7 +121,9 @@ export default function Header() {
               <Link
                 key={item.to}
                 to={item.to}
-                className={`${getNavClass(item.isActive)}${index === centerNavItems.length - 1 ? " last-in-group" : ""}`}
+                className={`${getNavClass(item.isActive)}${
+                  index === centerNavItems.length - 1 ? " last-in-group" : ""
+                }`}
                 onClick={closeMenu}
               >
                 {item.label}
@@ -94,7 +136,9 @@ export default function Header() {
               <Link
                 key={item.to}
                 to={item.to}
-                className={`${getNavClass(item.isActive)}${index === rightNavItems.length - 1 ? " last-in-group" : ""}`}
+                className={`${getNavClass(item.isActive)}${
+                  index === rightNavItems.length - 1 ? " last-in-group" : ""
+                }`}
                 onClick={closeMenu}
               >
                 {item.label}
@@ -108,26 +152,31 @@ export default function Header() {
           className={`menu-toggle${isMenuOpen ? " open" : ""}`}
           aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
           aria-expanded={isMenuOpen}
+          aria-controls="header-mobile-nav"
           onClick={() => setIsMenuOpen((current) => !current)}
         >
           <span />
           <span />
           <span />
         </button>
-
-        <nav className={`header-mobile-nav${isMenuOpen ? " open" : ""}`} aria-label="Mobile navigation">
-          {mobileNavItems.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              className={getNavClass(item.isActive)}
-              onClick={closeMenu}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
       </div>
+
+      <nav
+        id="header-mobile-nav"
+        className={`header-mobile-nav${isMenuOpen ? " open" : ""}`}
+        aria-label="Mobile navigation"
+      >
+        {mobileNavItems.map((item) => (
+          <Link
+            key={item.to}
+            to={item.to}
+            className={getNavClass(item.isActive)}
+            onClick={closeMenu}
+          >
+            {item.label}
+          </Link>
+        ))}
+      </nav>
     </header>
   );
 }

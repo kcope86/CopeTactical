@@ -46,7 +46,6 @@
     color: var(--color-highlight);
 }
 
-
 .header-desktop-nav {
     display: flex;
     align-items: stretch;
@@ -126,7 +125,7 @@
     width: 18px;
     height: 2px;
     background: var(--color-text);
-    transition: transform 0.2s ease, opacity 0.2s ease;
+    transition: transform 0.22s ease, opacity 0.22s ease;
 }
 
 .menu-toggle.open span:nth-child(1) {
@@ -224,10 +223,18 @@
         gap: 12px;
     }
 
+    .site-header {
+        transition: background-color 0.22s ease;
+    }
+
     .header-inner {
         min-height: 72px;
         padding: 0 14px;
-        grid-template-columns: auto 1fr auto;
+        transition: min-height 0.26s ease;
+    }
+
+    .site-header.mobile-open .header-inner {
+        min-height: 92px;
     }
 
     .header-logo {
@@ -244,25 +251,32 @@
     }
 
     .header-mobile-nav {
-        display: none;
-        position: absolute;
-        top: calc(100% + 8px);
-        right: 14px;
-        left: 14px;
-        min-width: 0;
-        padding: 12px;
-        background: var(--color-surface);
-        border: 1px solid var(--color-border);
-        border-radius: 10px;
-        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+        display: flex;
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 14px 0;
+        overflow: hidden;
+        max-height: 0;
+        opacity: 0;
+        transform: translateY(-8px);
+        pointer-events: none;
+        transition:
+            max-height 0.28s ease,
+            opacity 0.2s ease,
+            transform 0.22s ease,
+            padding-bottom 0.22s ease;
         flex-direction: column;
-        align-items: stretch;
-        gap: 0;
+        align-items: center;
+        gap: 8px;
         z-index: 120;
     }
 
     .header-mobile-nav.open {
-        display: flex;
+        max-height: 320px;
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+        padding-bottom: 14px;
     }
 
     .header-mobile-nav .nav-link {
@@ -270,18 +284,15 @@
         width: 100%;
         min-height: 48px;
         justify-content: center;
-        border-left: 1px solid black;
-        border-right: 1px solid black;
-        border-top: none;
-        border-bottom: none;
+        border: none;
     }
 
     .header-mobile-nav .nav-link + .nav-link {
-        margin-top: 8px;
+        margin-top: 0;
     }
 
     .header-mobile-nav .nav-link.last-in-group {
-        border-right: 1px solid black;
+        border-right: none;
     }
 }
 
