@@ -21,6 +21,11 @@
     text-decoration: underline;
 }
 
+.build-detail-main-image-wrapper,
+.build-detail-gallery-card {
+    cursor: pointer;
+}
+
 .build-detail-hero {
     display: grid;
     grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);

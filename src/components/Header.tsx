@@ -80,6 +80,11 @@ export default function Header() {
         location.pathname.startsWith("/gallery") ||
         location.pathname.startsWith("/build/"),
     },
+    {
+      to: "/materials",
+      label: "Materials",
+      isActive: location.pathname.startsWith("/materials"),
+    },
   ];
 
   const rightNavItems: NavItem[] = [
