@@ -157,6 +157,15 @@
     line-height: 1.55;
 }
 
+input::placeholder,
+textarea::placeholder {
+    opacity: 0.55;
+}
+
+textarea::placeholder {
+    white-space: pre-line;
+}
+
 /* ===== Responsive ===== */
 
 @media (max-width: 768px) {

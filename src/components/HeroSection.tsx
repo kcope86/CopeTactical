@@ -60,11 +60,17 @@ export default function HeroSection({ image, children }: Props) {
       <div className="hero-overlay"></div>
 
       <div className="hero-content">
-        <h1>Custom Paracord Rifle & Shotgun Slings</h1>
+        <h1>Custom Handmade Paracord Rifle Slings.</h1>
 
-        <p className="hero-text">Handmade. Durable. Customizable.</p>
+        <p className="hero-text">Built by hand, one at a time. No Factory. No Shortcuts. No Shit.</p>
+        <p className="hero-subtext">Check out some of my completed builds, and current/upcoming projects on the Builds page</p>
+        <p className="hero-subtext">Learn more about Cope Tactical - what makes our slings stand-out, and why they are outstanding.</p>
+        <p className="hero-subtext">Quality you'll notice the moment you see it.</p>
+        <p className="hero-subtext">Comfort you'll feel the moment you wear it.</p>        
+        <p className="hero-subtext">Dependability you'll trust - every time you run it.</p>
 
-        <p className="hero-subtext">Online Storefront Coming Soon</p>
+        
+        <p className="hero-subtext"></p>
       </div>
 
       {children && <div className="hero-featured-slot">{children}</div>}

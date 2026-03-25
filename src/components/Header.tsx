@@ -75,7 +75,7 @@ export default function Header() {
     },
     {
       to: "/gallery",
-      label: "Gallery",
+      label: "Builds",
       isActive:
         location.pathname.startsWith("/gallery") ||
         location.pathname.startsWith("/build/"),
@@ -96,7 +96,7 @@ export default function Header() {
         location.pathname.startsWith("/paracord"),
     },
     {
-      to: "/contact",
+      to: "/contact?to=design@copetactical.com",
       label: "Contact",
       isActive: location.pathname.startsWith("/contact"),
     },

@@ -121,6 +121,79 @@
     display: block;
 }
 
+/* ===== Lightbox ===== */
+
+.lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.88);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.lightbox-image-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.lightbox-image {
+    max-width: 82vw;
+    max-height: 82vh;
+    object-fit: contain;
+    display: block;
+}
+
+.lightbox-prev,
+.lightbox-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 48px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    line-height: 1;
+    padding: 8px 14px;
+}
+
+.lightbox-prev {
+    left: 20px;
+}
+
+.lightbox-next {
+    right: 20px;
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 40px;
+    background: rgba(0, 0, 0, 0.35);
+    border: none;
+    color: white;
+    cursor: pointer;
+    line-height: 1;
+    padding: 2px 8px;
+}
+
+.lightbox-counter {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    background: rgba(0, 0, 0, 0.35);
+    padding: 8px 12px;
+    border-radius: 999px;
+}
+
 @media (max-width: 980px) {
     .build-detail-hero {
         grid-template-columns: 1fr;

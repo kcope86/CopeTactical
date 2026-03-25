@@ -57,6 +57,10 @@
     color: inherit;
 }
 
+.gallery-banner-link:hover {
+    text-decoration: none;
+}
+
 .gallery-banner {
     display: grid;
     grid-template-columns: 220px minmax(0, 1fr);
@@ -75,6 +79,10 @@
     transform: translateY(-2px);
     border-color: var(--color-highlight);
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+}
+
+.gallery-banner-link:hover .gallery-banner-title {
+    text-decoration: underline;
 }
 
 .gallery-banner-image-wrapper {
@@ -108,9 +116,10 @@
 
 .gallery-banner-meta-row {
     display: grid;
-    grid-template-columns: 110px 1fr;
+    grid-template-columns: max-content 1fr;
     column-gap: 8px;
     align-items: start;
+    justify-content: start;
 }
 
 .gallery-banner-meta-label {

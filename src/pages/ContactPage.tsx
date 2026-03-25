@@ -1,36 +1,88 @@
 import "../styles/contact.css";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+
+const SALES_EMAIL = "sales@copetactical.com";
+const SUPPORT_EMAIL = "support@copetactical.com";
+const DESIGN_EMAIL = "design@copetactical.com";
+
+type ContactRecipient =
+  | typeof SALES_EMAIL
+  | typeof SUPPORT_EMAIL
+  | typeof DESIGN_EMAIL;
+
+type ContactTemplate = {
+  subject: string;
+  body: string;
+};
+
+const CONTACT_TEMPLATES: Record<ContactRecipient, ContactTemplate> = {
+  [SALES_EMAIL]: {
+    subject: "Custom sling inquiry",
+    body:
+      "Hi,\n\nI'm interested in a custom sling and would like more information about options, pricing, and lead time.\n\nThanks,",
+  },
+  [SUPPORT_EMAIL]: {
+    subject: "Question about an existing order",
+    body:
+      "Hi,\n\nI'm reaching out with a question about an existing order, existing product, or support issue.\n\nThanks,",
+  },
+  [DESIGN_EMAIL]: {
+    subject: "Custom design request",
+    body:
+      "Hi,\n\nI have a custom sling idea and would like to discuss the design, colors, hardware, and overall configuration.\n\nThanks,",
+  },
+};
+
+function isValidRecipient(value: string | null): value is ContactRecipient {
+  return value === SALES_EMAIL || value === SUPPORT_EMAIL || value === DESIGN_EMAIL;
+}
 
 export default function ContactPage() {
   const [searchParams] = useSearchParams();
 
-  const [to, setTo] = useState("sales@copetactical.com");
+  const [to, setTo] = useState<ContactRecipient>(DESIGN_EMAIL);
   const [from, setFrom] = useState("");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
 
+  const currentTemplate = useMemo(() => CONTACT_TEMPLATES[to], [to]);
+
   useEffect(() => {
     const toParam = searchParams.get("to");
 
-    if (
-      toParam === "sales@copetactical.com" ||
-      toParam === "support@copetactical.com"
-    ) {
+    if (isValidRecipient(toParam)) {
       setTo(toParam);
+      return;
     }
+
+    setTo(DESIGN_EMAIL);
   }, [searchParams]);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const text = `${body}\n\nFrom: ${from}`;
+    const finalSubject =
+      subject.trim() === "" ? currentTemplate.subject : subject;
+
+    const finalBody =
+      body.trim() === "" ? currentTemplate.body : body;
+
+    const text = `${finalBody}\n\nFrom: ${from}`;
     const url =
       `mailto:${to}` +
-      `?subject=${encodeURIComponent(subject)}` +
+      `?subject=${encodeURIComponent(finalSubject)}` +
       `&body=${encodeURIComponent(text)}`;
 
     window.location.href = url;
+  };
+
+  const handleToChange = (value: string) => {
+    if (!isValidRecipient(value)) {
+      return;
+    }
+
+    setTo(value);
   };
 
   return (
@@ -55,14 +107,11 @@ export default function ContactPage() {
                 <select
                   id="to"
                   value={to}
-                  onChange={(e) => setTo(e.target.value)}
+                  onChange={(e) => handleToChange(e.target.value)}
                 >
-                  <option value="sales@copetactical.com">
-                    sales@copetactical.com
-                  </option>
-                  <option value="support@copetactical.com">
-                    support@copetactical.com
-                  </option>
+                  <option value={DESIGN_EMAIL}>{DESIGN_EMAIL}</option>
+                  <option value={SALES_EMAIL}>{SALES_EMAIL}</option>
+                  <option value={SUPPORT_EMAIL}>{SUPPORT_EMAIL}</option>
                 </select>
               </div>
 
@@ -81,8 +130,8 @@ export default function ContactPage() {
                 <label htmlFor="subject">Subject:</label>
                 <input
                   id="subject"
-                  required
                   value={subject}
+                  placeholder={currentTemplate.subject}
                   onChange={(e) => setSubject(e.target.value)}
                 />
               </div>
@@ -91,8 +140,8 @@ export default function ContactPage() {
                 <label htmlFor="body">Body:</label>
                 <textarea
                   id="body"
-                  required
                   value={body}
+                  placeholder={currentTemplate.body}
                   onChange={(e) => setBody(e.target.value)}
                 />
               </div>

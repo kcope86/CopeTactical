@@ -1,13 +1,14 @@
 import "../styles/build-detail.css";
 
 import { Link, useParams } from "react-router-dom";
-import { MouseEvent, useState } from "react";
+import { MouseEvent, useRef, useState, WheelEvent } from "react";
 import { getBuildById, getBuildGalleryImages } from "../data/buildHelpers";
 
 export default function BuildDetailPage() {
   const { id } = useParams<{ id: string }>();
   const build = id ? getBuildById(id) : undefined;
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+  const lastWheelTimeRef = useRef(0);
 
   if (!build) {
     return (
@@ -48,6 +49,42 @@ export default function BuildDetailPage() {
 
   const handleLightboxBackdropClick = (e: MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) closeLightbox();
+  };
+
+  const handleLightboxWheel = (e: WheelEvent<HTMLDivElement>) => {
+    if (selectedImageIndex === null) return;
+
+    e.preventDefault();
+
+    const now = Date.now();
+    if (now - lastWheelTimeRef.current < 180) {
+      return;
+    }
+
+    const absX = Math.abs(e.deltaX);
+    const absY = Math.abs(e.deltaY);
+
+    if (absX < 8 && absY < 8) {
+      return;
+    }
+
+    lastWheelTimeRef.current = now;
+
+    if (absX > absY) {
+      if (e.deltaX > 0) {
+        showNextImage();
+      } else if (e.deltaX < 0) {
+        showPreviousImage();
+      }
+
+      return;
+    }
+
+    if (e.deltaY > 0) {
+      showNextImage();
+    } else if (e.deltaY < 0) {
+      showPreviousImage();
+    }
   };
 
   return (
@@ -123,19 +160,26 @@ export default function BuildDetailPage() {
       </div>
 
       {selectedImageIndex !== null && (
-        <div className="lightbox" onClick={handleLightboxBackdropClick}>
-          <button className="lightbox-close" onClick={closeLightbox}>
-            ×
-          </button>
-
+        <div
+          className="lightbox"
+          onClick={handleLightboxBackdropClick}
+          onWheel={handleLightboxWheel}
+        >
           <button className="lightbox-prev" onClick={showPreviousImage}>
             ‹
           </button>
 
-          <img
-            className="lightbox-image"
-            src={lightboxImages[selectedImageIndex]}
-          />
+          <div className="lightbox-image-wrapper">
+            <button className="lightbox-close" onClick={closeLightbox}>
+              ×
+            </button>
+
+            <img
+              className="lightbox-image"
+              src={lightboxImages[selectedImageIndex]}
+              alt={`${build.name} image ${selectedImageIndex + 1}`}
+            />
+          </div>
 
           <button className="lightbox-next" onClick={showNextImage}>
             ›

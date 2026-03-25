@@ -10,6 +10,8 @@ const AUTO_SCROLL_MS = 5000;
 const SWIPE_THRESHOLD_PX = 50;
 const FAST_SWIPE_MS = 220;
 const VERY_FAST_SWIPE_MS = 120;
+const WHEEL_HORIZONTAL_THRESHOLD = 12;
+const WHEEL_COOLDOWN_MS = 180;
 
 function getVisibleCount(width: number): number {
   if (width <= 480) return 3;
@@ -37,6 +39,7 @@ export default function FeaturedSection({ onSelectImage }: Props) {
   const touchStartXRef = useRef<number | null>(null);
   const touchCurrentXRef = useRef<number | null>(null);
   const touchStartTimeRef = useRef<number | null>(null);
+  const lastWheelTimeRef = useRef(0);
 
   const maxStartIndex = Math.max(0, featuredBuilds.length - visibleCount);
 
@@ -164,6 +167,31 @@ export default function FeaturedSection({ onSelectImage }: Props) {
     moveViewportBy(-steps);
   }
 
+  function handleWheel(e: React.WheelEvent<HTMLDivElement>) {
+    const absX = Math.abs(e.deltaX);
+    const absY = Math.abs(e.deltaY);
+
+    if (absX < WHEEL_HORIZONTAL_THRESHOLD || absX <= absY) {
+      return;
+    }
+
+    e.preventDefault();
+
+    const now = Date.now();
+    if (now - lastWheelTimeRef.current < WHEEL_COOLDOWN_MS) {
+      return;
+    }
+
+    lastWheelTimeRef.current = now;
+
+    if (e.deltaX > 0) {
+      handleNext();
+      return;
+    }
+
+    handlePrev();
+  }
+
   if (!featuredBuilds.length) return null;
 
   return (
@@ -190,6 +218,7 @@ export default function FeaturedSection({ onSelectImage }: Props) {
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
+            onWheel={handleWheel}
           >
             <div
               className="featured-track"
