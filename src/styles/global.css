@@ -6,6 +6,11 @@ body,
     padding: 0;
 }
 
+html {
+    overflow-y: scroll;
+    scrollbar-gutter: stable;
+}
+
 :root {
     --color-bg: #23252a;
     --color-surface: #2a2e34;

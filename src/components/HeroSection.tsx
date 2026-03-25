@@ -1,14 +1,15 @@
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import "../styles/hero.css";
 
 type Props = {
   image?: string;
+  children?: ReactNode;
 };
 
 const DEFAULT_HERO_IMAGE = "/hero.png";
 const FADE_DURATION_MS = 450;
 
-export default function HeroSection({ image }: Props) {
+export default function HeroSection({ image, children }: Props) {
   const nextImage = image ?? DEFAULT_HERO_IMAGE;
 
   const [baseImage, setBaseImage] = useState<string>(nextImage);
@@ -59,12 +60,14 @@ export default function HeroSection({ image }: Props) {
       <div className="hero-overlay"></div>
 
       <div className="hero-content">
-        <h1>Custom Paracord Rifle Slings</h1>
+        <h1>Custom Paracord Rifle & Shotgun Slings</h1>
 
-        <p className="hero-text">Handmade. Durable. Built for real use.</p>
+        <p className="hero-text">Handmade. Durable. Customizable.</p>
 
-        <p className="hero-subtext">Built one at a time. No shortcuts.</p>
+        <p className="hero-subtext">Online Storefront Coming Soon</p>
       </div>
+
+      {children && <div className="hero-featured-slot">{children}</div>}
     </div>
   );
 }

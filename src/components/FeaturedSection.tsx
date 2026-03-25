@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import FeaturedCard from "./FeaturedCard";
-import { builds } from "../data/builds";
+import { getFeaturedBuilds } from "../data/buildHelpers";
 
 type Props = {
   onSelectImage: (src: string) => void;
@@ -8,28 +8,27 @@ type Props = {
 
 const AUTO_SCROLL_MS = 5000;
 const SWIPE_THRESHOLD_PX = 50;
+const FAST_SWIPE_MS = 220;
+const VERY_FAST_SWIPE_MS = 120;
 
 function getVisibleCount(width: number): number {
-  if (width <= 480) {
-    return 3;
-  }
-
-  if (width <= 1100) {
-    return 2;
-  }
-
+  if (width <= 480) return 3;
+  if (width <= 1100) return 2;
   return 4;
 }
 
-function clamp(value: number, min: number, max: number): number {
+function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
 
 export default function FeaturedSection({ onSelectImage }: Props) {
+  const featuredBuilds = useMemo(() => getFeaturedBuilds(), []);
+
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [visibleCount, setVisibleCount] = useState<number>(() =>
     typeof window === "undefined" ? 4 : getVisibleCount(window.innerWidth)
   );
+  const [startIndex, setStartIndex] = useState(0);
   const [isHoveredOrFocused, setIsHoveredOrFocused] = useState(false);
   const [isTabVisible, setIsTabVisible] = useState<boolean>(() =>
     typeof document === "undefined" ? true : !document.hidden
@@ -37,6 +36,14 @@ export default function FeaturedSection({ onSelectImage }: Props) {
 
   const touchStartXRef = useRef<number | null>(null);
   const touchCurrentXRef = useRef<number | null>(null);
+  const touchStartTimeRef = useRef<number | null>(null);
+
+  const maxStartIndex = Math.max(0, featuredBuilds.length - visibleCount);
+
+  const endIndex = Math.min(
+    featuredBuilds.length - 1,
+    startIndex + visibleCount - 1
+  );
 
   useEffect(() => {
     function handleResize() {
@@ -46,20 +53,17 @@ export default function FeaturedSection({ onSelectImage }: Props) {
     handleResize();
     window.addEventListener("resize", handleResize);
 
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
-    const selectedBuild = builds[selectedIndex];
+    if (!featuredBuilds.length) return;
 
-    if (!selectedBuild) {
-      return;
-    }
+    const build = featuredBuilds[selectedIndex];
+    if (!build) return;
 
-    onSelectImage(selectedBuild.images[0].src);
-  }, [selectedIndex, onSelectImage]);
+    onSelectImage(build.hero);
+  }, [selectedIndex, featuredBuilds, onSelectImage]);
 
   useEffect(() => {
     function handleVisibilityChange() {
@@ -67,49 +71,53 @@ export default function FeaturedSection({ onSelectImage }: Props) {
     }
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    return () => {
+    return () =>
       document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
   }, []);
 
   useEffect(() => {
     const shouldPause = isHoveredOrFocused || !isTabVisible;
 
-    if (shouldPause || builds.length <= 1) {
+    if (shouldPause || featuredBuilds.length <= 1) {
       return;
     }
 
     const intervalId = window.setInterval(() => {
-      setSelectedIndex((current) => (current + 1) % builds.length);
+      setSelectedIndex((current) => (current + 1) % featuredBuilds.length);
     }, AUTO_SCROLL_MS);
 
-    return () => {
-      window.clearInterval(intervalId);
-    };
-  }, [isHoveredOrFocused, isTabVisible]);
+    return () => window.clearInterval(intervalId);
+  }, [featuredBuilds.length, isHoveredOrFocused, isTabVisible]);
 
-  const maxStartIndex = Math.max(0, builds.length - visibleCount);
+  useEffect(() => {
+    if (!featuredBuilds.length) return;
 
-  const startIndex = useMemo(() => {
-    const centeredIndex = selectedIndex - Math.floor(visibleCount / 2);
-    return clamp(centeredIndex, 0, maxStartIndex);
-  }, [selectedIndex, visibleCount, maxStartIndex]);
+    setSelectedIndex((current) => clamp(current, 0, featuredBuilds.length - 1));
+  }, [featuredBuilds.length]);
 
-  function handlePrev() {
-    setSelectedIndex((current) =>
-      current === 0 ? builds.length - 1 : current - 1
+  useEffect(() => {
+    setStartIndex((current) => clamp(current, 0, maxStartIndex));
+  }, [maxStartIndex]);
+
+  function moveViewportBy(stepDelta: number) {
+    setStartIndex((current) =>
+      clamp(current + stepDelta, 0, maxStartIndex)
     );
   }
 
+  function handlePrev() {
+    moveViewportBy(-1);
+  }
+
   function handleNext() {
-    setSelectedIndex((current) => (current + 1) % builds.length);
+    moveViewportBy(1);
   }
 
   function handleTouchStart(e: React.TouchEvent<HTMLDivElement>) {
     const touch = e.touches[0];
     touchStartXRef.current = touch.clientX;
     touchCurrentXRef.current = touch.clientX;
+    touchStartTimeRef.current = Date.now();
     setIsHoveredOrFocused(true);
   }
 
@@ -121,34 +129,46 @@ export default function FeaturedSection({ onSelectImage }: Props) {
   function handleTouchEnd() {
     const startX = touchStartXRef.current;
     const endX = touchCurrentXRef.current;
+    const startTime = touchStartTimeRef.current;
 
     touchStartXRef.current = null;
     touchCurrentXRef.current = null;
+    touchStartTimeRef.current = null;
     setIsHoveredOrFocused(false);
 
-    if (startX === null || endX === null) {
+    if (startX === null || endX === null || startTime === null) {
       return;
     }
 
     const deltaX = endX - startX;
+    const absDeltaX = Math.abs(deltaX);
+    const elapsedMs = Date.now() - startTime;
 
-    if (Math.abs(deltaX) < SWIPE_THRESHOLD_PX) {
+    if (absDeltaX < SWIPE_THRESHOLD_PX) {
       return;
+    }
+
+    let steps = 1;
+
+    if (absDeltaX >= 180 || elapsedMs <= VERY_FAST_SWIPE_MS) {
+      steps = 3;
+    } else if (absDeltaX >= 110 || elapsedMs <= FAST_SWIPE_MS) {
+      steps = 2;
     }
 
     if (deltaX < 0) {
-      handleNext();
+      moveViewportBy(steps);
       return;
     }
 
-    handlePrev();
+    moveViewportBy(-steps);
   }
+
+  if (!featuredBuilds.length) return null;
 
   return (
     <section className="featured">
       <div className="featured-inner">
-        <h2>Featured Builds</h2>
-
         <div
           className="featured-carousel"
           onMouseEnter={() => setIsHoveredOrFocused(true)}
@@ -160,7 +180,7 @@ export default function FeaturedSection({ onSelectImage }: Props) {
             type="button"
             className="featured-arrow"
             onClick={handlePrev}
-            aria-label="Previous featured builds"
+            aria-label="Previous visible featured builds"
           >
             ‹
           </button>
@@ -177,13 +197,15 @@ export default function FeaturedSection({ onSelectImage }: Props) {
                 transform: `translateX(calc(${startIndex} * -1 * ((100% + var(--featured-gap)) / var(--featured-visible-count))))`,
               }}
             >
-              {builds.map((build, index) => (
+              {featuredBuilds.map((build, index) => (
                 <FeaturedCard
                   key={build.id}
-                  imageSrc={build.images[0].src}
-                  imageAlt={build.images[0].alt}
+                  imageSrc={build.thumb}
+                  imageAlt={build.name}
                   title={build.name}
                   isActive={index === selectedIndex}
+                  isEdgeLeft={index === startIndex}
+                  isEdgeRight={index === endIndex}
                   onClick={() => setSelectedIndex(index)}
                 />
               ))}
@@ -194,19 +216,19 @@ export default function FeaturedSection({ onSelectImage }: Props) {
             type="button"
             className="featured-arrow"
             onClick={handleNext}
-            aria-label="Next featured builds"
+            aria-label="Next visible featured builds"
           >
             ›
           </button>
         </div>
 
         <div className="featured-dots" aria-label="Featured build positions">
-          {builds.map((build, index) => (
+          {featuredBuilds.map((build, index) => (
             <button
               key={build.id}
               type="button"
               className={`featured-dot${index === selectedIndex ? " active" : ""}`}
-              aria-label={`Go to featured build ${index + 1}`}
+              aria-label={`Select featured build ${index + 1}`}
               onClick={() => setSelectedIndex(index)}
             />
           ))}

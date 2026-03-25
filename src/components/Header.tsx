@@ -1,14 +1,15 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+
+type NavItem = {
+  to: string;
+  label: string;
+  isActive: boolean;
+};
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isAboutOpen, setIsAboutOpen] = useState(false);
-
   const location = useLocation();
-  const navigate = useNavigate();
-  const aboutGroupRef = useRef<HTMLDivElement | null>(null);
-  const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
 
   useEffect(() => {
     function handleResize() {
@@ -22,62 +23,44 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
-    function handleDocumentClick(e: MouseEvent) {
-      if (!aboutGroupRef.current) {
-        return;
-      }
-
-      if (!aboutGroupRef.current.contains(e.target as Node)) {
-        setIsAboutOpen(false);
-      }
-    }
-
-    document.addEventListener("mousedown", handleDocumentClick);
-    return () => document.removeEventListener("mousedown", handleDocumentClick);
-  }, []);
-
-  useEffect(() => {
     setIsMenuOpen(false);
-    setIsAboutOpen(false);
   }, [location.pathname, location.hash]);
 
   function closeMenu() {
     setIsMenuOpen(false);
-    setIsAboutOpen(false);
   }
 
-  function handleAboutActivate(e: React.MouseEvent<HTMLButtonElement>) {
-    if (window.innerWidth > 768) {
-      navigate("/about");
-      return;
-    }
-
-    if (!isAboutOpen) {
-      e.preventDefault();
-      setIsAboutOpen(true);
-      return;
-    }
-
-    navigate("/about");
+  function getNavClass(isActive: boolean) {
+    return `nav-link${isActive ? " active" : ""}`;
   }
 
-  function handleAboutCaretToggle(e: React.MouseEvent<HTMLButtonElement>) {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsAboutOpen((current) => !current);
-  }
+  const centerNavItems: NavItem[] = [
+    {
+      to: "/",
+      label: "Home",
+      isActive: location.pathname === "/",
+    },
+    {
+      to: "/gallery",
+      label: "Gallery",
+      isActive: location.pathname.startsWith("/gallery") || location.pathname.startsWith("/build/"),
+    },
+  ];
 
-  function handleAboutMouseEnter() {
-    if (window.innerWidth > 768) {
-      setIsAboutOpen(true);
-    }
-  }
+  const rightNavItems: NavItem[] = [
+    {
+      to: "/about",
+      label: "About",
+      isActive: location.pathname.startsWith("/about") || location.pathname.startsWith("/paracord"),
+    },
+    {
+      to: "/contact",
+      label: "Contact",
+      isActive: location.pathname.startsWith("/contact"),
+    },
+  ];
 
-  function handleAboutMouseLeave() {
-    if (window.innerWidth > 768) {
-      setIsAboutOpen(false);
-    }
-  }
+  const mobileNavItems = [...centerNavItems, ...rightNavItems];
 
   return (
     <header className="site-header">
@@ -92,6 +75,34 @@ export default function Header() {
           </Link>
         </div>
 
+        <div className="header-desktop-nav">
+          <nav className="header-center" aria-label="Primary">
+            {centerNavItems.map((item, index) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className={`${getNavClass(item.isActive)}${index === centerNavItems.length - 1 ? " last-in-group" : ""}`}
+                onClick={closeMenu}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+
+          <nav className="header-right" aria-label="Secondary">
+            {rightNavItems.map((item, index) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className={`${getNavClass(item.isActive)}${index === rightNavItems.length - 1 ? " last-in-group" : ""}`}
+                onClick={closeMenu}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+
         <button
           type="button"
           className={`menu-toggle${isMenuOpen ? " open" : ""}`}
@@ -104,50 +115,17 @@ export default function Header() {
           <span />
         </button>
 
-        <nav className={`header-nav${isMenuOpen ? " open" : ""}`}>
-          <Link to="/gallery" onClick={closeMenu}>
-            Gallery
-          </Link>
-
-          <div
-            className={`header-nav-dropdown${isAboutOpen ? " open" : ""}`}
-            ref={aboutGroupRef}
-            onMouseEnter={handleAboutMouseEnter}
-            onMouseLeave={handleAboutMouseLeave}
-          >
-            <div className="header-nav-dropdown-trigger">
-              <button
-                type="button"
-                className="header-nav-link-button"
-                onClick={handleAboutActivate}
-                aria-expanded={isAboutOpen}
-                aria-haspopup="true"
-              >
-                About
-              </button>
-
-              <button
-                type="button"
-                className={`header-nav-caret${isAboutOpen ? " open" : ""}`}
-                aria-label={isAboutOpen ? "Collapse About menu" : "Expand About menu"}
-                aria-expanded={isAboutOpen}
-                aria-haspopup="true"
-                onClick={handleAboutCaretToggle}
-              >
-                <span />
-              </button>
-            </div>
-
-            <div className="header-nav-dropdown-menu">
-              <Link to="/paracord" className="header-nav-dropdown-item" onClick={closeMenu}>
-                550 Facts
-              </Link>
-            </div>
-          </div>
-
-          <Link to="/contact" onClick={closeMenu}>
-            Contact
-          </Link>
+        <nav className={`header-mobile-nav${isMenuOpen ? " open" : ""}`} aria-label="Mobile navigation">
+          {mobileNavItems.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              className={getNavClass(item.isActive)}
+              onClick={closeMenu}
+            >
+              {item.label}
+            </Link>
+          ))}
         </nav>
       </div>
     </header>

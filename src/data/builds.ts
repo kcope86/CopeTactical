@@ -1,78 +1,66 @@
-export type BuildImage = {
-  src: string;
-  alt: string;
-};
-
 export type Build = {
   id: string;
   name: string;
-  images: BuildImage[];
+  featured: boolean;
+  available: boolean;
+  hero: string;
+  thumb: string;
+  galleryCount: number;
 };
 
 export const builds: Build[] = [
   {
-    id: "phantom-sling",
-    name: "Phantom Sling",
-    images: [
-      {
-        src: "/images/builds/Sanctified/PhantomSling1.png",
-        alt: "Phantom sling",
-      },
-    ],
+    id: "sanctified-phantom",
+    name: "Sanctified Phantom",
+    featured: true,
+    available: true,
+    hero: "/images/builds/sanctified-phantom/hero.jpg",
+    thumb: "/images/builds/sanctified-phantom/thumb.jpg",
+    galleryCount: 3,
   },
-
   {
-    id: "double-cobra-rifle",
-    name: "Double Cobra",
-    images: [
-      {
-        src: "/images/builds/DoubleCobra/double-cobra-on-rifle.png",
-        alt: "Double cobra on rifle",
-      },
-    ],
+    id: "shade-double-cobra",
+    name: "The Shade",
+    featured: true,
+    available: true,
+    hero: "/images/builds/shade-double-cobra/hero.jpg",
+    thumb: "/images/builds/shade-double-cobra/thumb.jpg",
+    galleryCount: 3,
   },
-
   {
-    id: "double-mated-snake",
-    name: "Double Mated Snake",
-    images: [
-      {
-        src: "/images/builds/MatedSnake/double-mated-snake-weave.png",
-        alt: "Double mated snake",
-      },
-    ],
+    id: "america-double-cobra",
+    name: "America F*** Yeah!",
+    featured: true,
+    available: true,
+    hero: "/images/builds/america-double-cobra/hero.jpg",
+    thumb: "/images/builds/america-double-cobra/thumb.jpg",
+    galleryCount: 3,
   },
-
   {
-    id: "carbon-fiber-spinal",
-    name: "Carbon Fiber Spinal",
-    images: [
-      {
-        src: "/images/builds/BanesCuff/carbon-fiber-spinal-main.png",
-        alt: "Carbon fiber spinal",
-      },
-    ],
+    id: "hunter-double-cobra",
+    name: "The Hunter",
+    featured: true,
+    available: true,
+    hero: "/images/builds/hunter-double-cobra/hero.jpg",
+    thumb: "/images/builds/hunter-double-cobra/thumb.jpg",
+    galleryCount: 3,
   },
-
   {
-    id: "tan-double-cobra",
-    name: "Tan Double Cobra",
-    images: [
-      {
-        src: "/images/builds/DoubleCobra/tan-magpul-double-cobra.png",
-        alt: "Tan double cobra sling",
-      },
-    ],
+    id: "sultan-mated-snake",
+    name: "The Sultan",
+    featured: true,
+    available: true,
+    hero: "/images/builds/sultan-mated-snake/hero.jpg",
+    thumb: "/images/builds/sultan-mated-snake/thumb.jpg",
+    galleryCount: 2,
   },
-
   {
-    id: "black-double-cobra",
-    name: "Black Double Cobra",
-    images: [
-      {
-        src: "/images/builds/DoubleCobra/black-magpul-double-cobra.png",
-        alt: "Black double cobra sling",
-      },
-    ],
+    id: "reaper-banes-cuff",
+    name: "The Reaper",
+    featured: true,
+    available: true,
+    hero: "/images/builds/reaper-banes-cuff/hero.jpg",
+    thumb: "/images/builds/reaper-banes-cuff/thumb.jpg",
+    galleryCount: 4,
   },
 ];

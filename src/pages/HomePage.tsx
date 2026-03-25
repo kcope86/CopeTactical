@@ -10,8 +10,10 @@ export default function HomePage() {
 
   return (
     <>
-      <HeroSection image={heroImage} />
-      <FeaturedSection onSelectImage={setHeroImage} />
+      <HeroSection image={heroImage}>
+        <FeaturedSection onSelectImage={setHeroImage} />
+      </HeroSection>
+
       <AboutPreviewSection />
     </>
   );
