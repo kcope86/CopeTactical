@@ -3,13 +3,12 @@ import FeaturedCard from "./FeaturedCard";
 import { getFeaturedBuilds } from "../data/buildHelpers";
 
 type Props = {
-  onSelectImage: (src: string) => void;
+  selectedIndex: number;
+  onSelectIndex: (index: number) => void;
+  interactionKey: number;
 };
 
 const AUTO_SCROLL_MS = 5000;
-const SWIPE_THRESHOLD_PX = 50;
-const FAST_SWIPE_MS = 220;
-const VERY_FAST_SWIPE_MS = 120;
 const WHEEL_HORIZONTAL_THRESHOLD = 12;
 const WHEEL_COOLDOWN_MS = 180;
 
@@ -23,10 +22,13 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
 
-export default function FeaturedSection({ onSelectImage }: Props) {
+export default function FeaturedSection({
+  selectedIndex,
+  onSelectIndex,
+  interactionKey,
+}: Props) {
   const featuredBuilds = useMemo(() => getFeaturedBuilds(), []);
 
-  const [selectedIndex, setSelectedIndex] = useState(0);
   const [visibleCount, setVisibleCount] = useState<number>(() =>
     typeof window === "undefined" ? 4 : getVisibleCount(window.innerWidth)
   );
@@ -36,10 +38,11 @@ export default function FeaturedSection({ onSelectImage }: Props) {
     typeof document === "undefined" ? true : !document.hidden
   );
 
-  const touchStartXRef = useRef<number | null>(null);
-  const touchCurrentXRef = useRef<number | null>(null);
-  const touchStartTimeRef = useRef<number | null>(null);
   const lastWheelTimeRef = useRef(0);
+
+  const safeSelectedIndex = featuredBuilds.length
+    ? clamp(selectedIndex, 0, featuredBuilds.length - 1)
+    : 0;
 
   const maxStartIndex = Math.max(0, featuredBuilds.length - visibleCount);
 
@@ -60,15 +63,6 @@ export default function FeaturedSection({ onSelectImage }: Props) {
   }, []);
 
   useEffect(() => {
-    if (!featuredBuilds.length) return;
-
-    const build = featuredBuilds[selectedIndex];
-    if (!build) return;
-
-    onSelectImage(build.hero);
-  }, [selectedIndex, featuredBuilds, onSelectImage]);
-
-  useEffect(() => {
     function handleVisibilityChange() {
       setIsTabVisible(!document.hidden);
     }
@@ -86,26 +80,46 @@ export default function FeaturedSection({ onSelectImage }: Props) {
     }
 
     const intervalId = window.setInterval(() => {
-      setSelectedIndex((current) => (current + 1) % featuredBuilds.length);
+      onSelectIndex((safeSelectedIndex + 1) % featuredBuilds.length);
     }, AUTO_SCROLL_MS);
 
     return () => window.clearInterval(intervalId);
-  }, [featuredBuilds.length, isHoveredOrFocused, isTabVisible]);
+  }, [
+    featuredBuilds.length,
+    interactionKey,
+    isHoveredOrFocused,
+    isTabVisible,
+    onSelectIndex,
+    safeSelectedIndex,
+  ]);
 
   useEffect(() => {
-    if (!featuredBuilds.length) return;
+    if (!featuredBuilds.length) {
+      return;
+    }
 
-    setSelectedIndex((current) => clamp(current, 0, featuredBuilds.length - 1));
-  }, [featuredBuilds.length]);
+    if (selectedIndex !== safeSelectedIndex) {
+      onSelectIndex(safeSelectedIndex);
+    }
+  }, [featuredBuilds.length, onSelectIndex, safeSelectedIndex, selectedIndex]);
 
   useEffect(() => {
     setStartIndex((current) => clamp(current, 0, maxStartIndex));
   }, [maxStartIndex]);
 
+  useEffect(() => {
+    if (safeSelectedIndex < startIndex) {
+      setStartIndex(safeSelectedIndex);
+      return;
+    }
+
+    if (safeSelectedIndex > endIndex) {
+      setStartIndex(clamp(safeSelectedIndex - visibleCount + 1, 0, maxStartIndex));
+    }
+  }, [endIndex, maxStartIndex, safeSelectedIndex, startIndex, visibleCount]);
+
   function moveViewportBy(stepDelta: number) {
-    setStartIndex((current) =>
-      clamp(current + stepDelta, 0, maxStartIndex)
-    );
+    setStartIndex((current) => clamp(current + stepDelta, 0, maxStartIndex));
   }
 
   function handlePrev() {
@@ -114,57 +128,6 @@ export default function FeaturedSection({ onSelectImage }: Props) {
 
   function handleNext() {
     moveViewportBy(1);
-  }
-
-  function handleTouchStart(e: React.TouchEvent<HTMLDivElement>) {
-    const touch = e.touches[0];
-    touchStartXRef.current = touch.clientX;
-    touchCurrentXRef.current = touch.clientX;
-    touchStartTimeRef.current = Date.now();
-    setIsHoveredOrFocused(true);
-  }
-
-  function handleTouchMove(e: React.TouchEvent<HTMLDivElement>) {
-    const touch = e.touches[0];
-    touchCurrentXRef.current = touch.clientX;
-  }
-
-  function handleTouchEnd() {
-    const startX = touchStartXRef.current;
-    const endX = touchCurrentXRef.current;
-    const startTime = touchStartTimeRef.current;
-
-    touchStartXRef.current = null;
-    touchCurrentXRef.current = null;
-    touchStartTimeRef.current = null;
-    setIsHoveredOrFocused(false);
-
-    if (startX === null || endX === null || startTime === null) {
-      return;
-    }
-
-    const deltaX = endX - startX;
-    const absDeltaX = Math.abs(deltaX);
-    const elapsedMs = Date.now() - startTime;
-
-    if (absDeltaX < SWIPE_THRESHOLD_PX) {
-      return;
-    }
-
-    let steps = 1;
-
-    if (absDeltaX >= 180 || elapsedMs <= VERY_FAST_SWIPE_MS) {
-      steps = 3;
-    } else if (absDeltaX >= 110 || elapsedMs <= FAST_SWIPE_MS) {
-      steps = 2;
-    }
-
-    if (deltaX < 0) {
-      moveViewportBy(steps);
-      return;
-    }
-
-    moveViewportBy(-steps);
   }
 
   function handleWheel(e: React.WheelEvent<HTMLDivElement>) {
@@ -213,13 +176,7 @@ export default function FeaturedSection({ onSelectImage }: Props) {
             ‹
           </button>
 
-          <div
-            className="featured-viewport"
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-            onWheel={handleWheel}
-          >
+          <div className="featured-viewport" onWheel={handleWheel}>
             <div
               className="featured-track"
               style={{
@@ -232,10 +189,10 @@ export default function FeaturedSection({ onSelectImage }: Props) {
                   imageSrc={build.thumb}
                   imageAlt={build.name}
                   title={build.name}
-                  isActive={index === selectedIndex}
+                  isActive={index === safeSelectedIndex}
                   isEdgeLeft={index === startIndex}
                   isEdgeRight={index === endIndex}
-                  onClick={() => setSelectedIndex(index)}
+                  onClick={() => onSelectIndex(index)}
                 />
               ))}
             </div>
@@ -256,9 +213,9 @@ export default function FeaturedSection({ onSelectImage }: Props) {
             <button
               key={build.id}
               type="button"
-              className={`featured-dot${index === selectedIndex ? " active" : ""}`}
+              className={`featured-dot${index === safeSelectedIndex ? " active" : ""}`}
               aria-label={`Select featured build ${index + 1}`}
-              onClick={() => setSelectedIndex(index)}
+              onClick={() => onSelectIndex(index)}
             />
           ))}
         </div>

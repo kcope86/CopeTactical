@@ -326,6 +326,7 @@
     .featured-carousel {
         gap: 0;
         align-items: stretch;
+        min-height: 0;
     }
 
     .featured-arrow {
@@ -333,26 +334,11 @@
     }
 
     .featured-viewport {
-        width: 100%;
-        overflow: hidden;
+        display: none;
     }
 
     .featured-track {
-        grid-auto-columns: calc((100% - (var(--featured-gap) * 1.2)) / 2.2);
-    }
-
-    .featured-card {
-        padding: 6px;
-    }
-
-    .featured-card img {
-        height: 110px;
-    }
-
-    .featured-card h3 {
-        margin: 8px 0 2px;
-        font-size: 0.72rem;
-        line-height: 1.2;
+        display: none;
     }
 
     .featured-dots {
