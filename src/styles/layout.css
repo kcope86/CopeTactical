@@ -4,8 +4,10 @@
     width: 100%;
     background-color: var(--color-surface);
     border-bottom: 1px solid var(--color-border);
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
     z-index: 100;
 }
 
@@ -152,6 +154,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
+    padding-top: 84px;
 }
 
 .page {
@@ -232,6 +235,10 @@
         padding: 0 14px;
         transition: min-height 0.26s ease;
     }
+
+.site-main {
+    padding-top: 72px;
+}
 
     .site-header.mobile-open .header-inner {
         min-height: 78px;
