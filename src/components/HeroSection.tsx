@@ -1,8 +1,13 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import "../styles/hero.css";
 
 type Props = {
   image?: string;
+  header: string;
+  body: string;
+  sub: string;
+  subTo: string;
   children?: ReactNode;
   onSwipeNext?: () => void;
   onSwipePrev?: () => void;
@@ -15,6 +20,10 @@ const SWIPE_THRESHOLD_PX = 50;
 
 export default function HeroSection({
   image,
+  header,
+  body,
+  sub,
+  subTo,
   children,
   onSwipeNext,
   onSwipePrev,
@@ -24,6 +33,12 @@ export default function HeroSection({
   const [baseImage, setBaseImage] = useState<string>(nextImage);
   const [overlayImage, setOverlayImage] = useState<string | null>(null);
   const [overlayVisible, setOverlayVisible] = useState(false);
+
+  const [displayHeader, setDisplayHeader] = useState(header);
+  const [displayBody, setDisplayBody] = useState(body);
+  const [displaySub, setDisplaySub] = useState(sub);
+  const [displaySubTo, setDisplaySubTo] = useState(subTo);
+  const [textVisible, setTextVisible] = useState(true);
 
   const touchStartXRef = useRef<number | null>(null);
   const touchCurrentXRef = useRef<number | null>(null);
@@ -50,6 +65,32 @@ export default function HeroSection({
       window.clearTimeout(finishTimer);
     };
   }, [nextImage, baseImage]);
+
+  useEffect(() => {
+    const contentChanged =
+      header !== displayHeader ||
+      body !== displayBody ||
+      sub !== displaySub ||
+      subTo !== displaySubTo;
+
+    if (!contentChanged) {
+      return;
+    }
+
+    setTextVisible(false);
+
+    const swapTimer = window.setTimeout(() => {
+      setDisplayHeader(header);
+      setDisplayBody(body);
+      setDisplaySub(sub);
+      setDisplaySubTo(subTo);
+      setTextVisible(true);
+    }, FADE_DURATION_MS / 2);
+
+    return () => {
+      window.clearTimeout(swapTimer);
+    };
+  }, [header, body, sub, subTo, displayHeader, displayBody, displaySub, displaySubTo]);
 
   function isMobileWidth() {
     return typeof window !== "undefined" && window.innerWidth <= MOBILE_BREAKPOINT_PX;
@@ -130,31 +171,14 @@ export default function HeroSection({
 
       <div className="hero-overlay"></div>
 
-      <div className="hero-content">
-        <h1>Custom Handmade Paracord Rifle Slings.</h1>
-
-        <p className="hero-text">
-          Built by hand, one at a time. No Factory. No Shortcuts. No Shit.
-        </p>
+      <div className={`hero-content${textVisible ? " visible" : " hidden"}`}>
+        <h1>{displayHeader}</h1>
+        <p className="hero-text">{displayBody}</p>
         <p className="hero-subtext">
-          Check out some of my completed builds, and current/upcoming projects on the
-          Builds page
+          <Link to={displaySubTo} className="hero-subtext-link">
+            {displaySub}
+          </Link>
         </p>
-        <p className="hero-subtext">
-          Learn more about Cope Tactical - what makes our slings stand-out, and why
-          they are outstanding.
-        </p>
-        <p className="hero-subtext">
-          Quality you'll notice the moment you see it.
-        </p>
-        <p className="hero-subtext">
-          Comfort you'll feel the moment you wear it.
-        </p>
-        <p className="hero-subtext">
-          Dependability you'll trust - every time you run it.
-        </p>
-
-        <p className="hero-subtext"></p>
       </div>
 
       {children && <div className="hero-featured-slot">{children}</div>}

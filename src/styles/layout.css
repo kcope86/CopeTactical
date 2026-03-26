@@ -236,9 +236,9 @@
         transition: min-height 0.26s ease;
     }
 
-.site-main {
-    padding-top: 72px;
-}
+    .site-main {
+        padding-top: 72px;
+    }
 
     .site-header.mobile-open .header-inner {
         min-height: 78px;
@@ -257,48 +257,53 @@
         justify-self: end;
     }
 
-.header-mobile-nav {
-    display: flex;
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 0 14px;
-    overflow: hidden;
+    .header-mobile-nav {
+        display: flex;
+        width: 100%;
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 14px;
+        overflow: hidden;
 
-    max-height: 0;
-    opacity: 0;
-    transform: translateY(-6px);
-    pointer-events: none;
+        max-height: 0;
+        opacity: 0;
+        transform: translateY(-6px);
+        pointer-events: none;
 
-    transition:
-        max-height 0.28s ease,
-        opacity 0.2s ease,
-        transform 0.22s ease;
+        transition:
+            max-height 0.28s ease,
+            opacity 0.2s ease,
+            transform 0.22s ease;
 
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    gap: 0;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 0;
 
-    z-index: 120;
-}
+        z-index: 120;
+    }
 
-.header-mobile-nav.open {
-    max-height: 70px;
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-}
+    .header-mobile-nav.open {
+        max-height: 70px;
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
 
-.header-mobile-nav .nav-link {
-    min-width: 90px;
-    height: 48px;
-    justify-content: center;
-    border-left: 1px solid black;
-}
+    .header-mobile-nav .nav-link {
+        min-width: 0;
+        flex: 1 1 0;
+        height: 48px;
+        justify-content: center;
+        border-left: 1px solid black;
+        padding: 0 8px;
+        font-size: 14px;
+        white-space: nowrap;
+    }
 
-.header-mobile-nav .nav-link.last-in-group {
-    border-right: 1px solid black;
-}
+    .header-mobile-nav .nav-link.last-in-group {
+        border-right: 1px solid black;
+    }
 
     .header-mobile-nav .nav-link + .nav-link {
         margin-top: 0;
@@ -326,6 +331,11 @@
 
     .header-logo {
         height: 40px;
+    }
+
+    .header-mobile-nav .nav-link {
+        padding: 0 6px;
+        font-size: 13px;
     }
 }
 

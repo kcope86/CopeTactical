@@ -26,7 +26,7 @@ export default function ParacordPage() {
             <p>
               550 paracord (also called Type III parachute cord) is a
               lightweight nylon kernmantle rope originally developed for U.S.
-              military parachutes during World War II. The name “550” comes from
+              Airborne forces during World War II. The name “550” comes from
               its minimum breaking strength of 550 pounds (≈249 kg).
             </p>
 
@@ -87,9 +87,9 @@ export default function ParacordPage() {
 
             <h3>Kern</h3>
             <ul>
-              <li>Usually 7 inner strands</li>
-              <li>Each strand has smaller fibers</li>
-              <li>Can be removed for other uses</li>
+              <li>7 inner strands</li>
+              <li>Each strand has 3 smaller fibers</li>
+              <li>Fibers can be removed for other uses</li>
             </ul>
 
             <h3>Typical specs</h3>
